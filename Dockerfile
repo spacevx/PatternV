@@ -24,7 +24,9 @@ COPY --from=cpp-build /src/build/PatternV /usr/local/bin/PatternV
 COPY --from=web-build /app/.next ./.next
 COPY --from=web-build /app/node_modules ./node_modules
 COPY --from=web-build /app/package.json ./
-COPY --from=web-build /app/public ./public
+# public/ may be empty; copy only if it exists
+RUN mkdir -p ./public
+COPY --from=web-build /app/next.config.ts ./
 
 ENV NODE_ENV=production
 ENV PATTERNV_EXE_PATH=/usr/local/bin/PatternV
