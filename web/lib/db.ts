@@ -91,16 +91,24 @@ export function insertSearch(
 
 export function getRecentSearch(
   pattern: string,
-  withinSeconds: number = 60
+  withinSeconds: number = 0
 ): HistoryDetail | null {
   const db = getDb();
-  const row = db
-    .prepare(
-      `SELECT * FROM searches
-     WHERE pattern = ? AND created_at > datetime('now', '-' || ? || ' seconds')
-     ORDER BY created_at DESC LIMIT 1`
-    )
-    .get(pattern, withinSeconds) as any;
+  const row = withinSeconds > 0
+    ? db
+        .prepare(
+          `SELECT * FROM searches
+       WHERE pattern = ? AND created_at > datetime('now', '-' || ? || ' seconds')
+       ORDER BY created_at DESC LIMIT 1`
+        )
+        .get(pattern, withinSeconds) as any
+    : db
+        .prepare(
+          `SELECT * FROM searches
+       WHERE pattern = ?
+       ORDER BY created_at DESC LIMIT 1`
+        )
+        .get(pattern) as any;
 
   if (!row) return null;
 

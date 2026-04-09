@@ -22,8 +22,8 @@ export async function POST(request: Request) {
     return Response.json({ error: validationError }, { status: 400 });
   }
 
-  // Check for recent identical scan (cache)
-  const cached = getRecentSearch(pattern, 60);
+  // Check for cached result -- builds never change, cache indefinitely
+  const cached = getRecentSearch(pattern, 0);
   if (cached) {
     return Response.json(
       {

@@ -11,6 +11,11 @@
 #include <semaphore>
 #include <cstring>
 
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+
 bool useColors = true;
 bool hideTime = false;
 bool minifiedOutput = false;
@@ -84,46 +89,78 @@ std::vector<size_t> searchAllPatternOffsets(const uint8_t* data, size_t size, co
     return matches;
 }
 
-std::vector<uint8_t> readFile(const fs::path& filepath) {
-    FILE* file = nullptr;
+class MappedFile {
+public:
+    MappedFile() = default;
 
-#ifdef _WIN32
-    if (fopen_s(&file, filepath.string().c_str(), "rb") != 0 || !file) {
-        std::cerr << "Failed to open: " << filepath << '\n';
-        return {};
-    }
-#else
-    file = fopen(filepath.string().c_str(), "rb");
-    if (!file) {
-        std::cerr << "Failed to open: " << filepath << '\n';
-        return {};
-    }
-#endif
+    explicit MappedFile(const fs::path& filepath) {
+        fd_ = open(filepath.string().c_str(), O_RDONLY);
+        if (fd_ == -1) {
+            std::cerr << "Failed to open: " << filepath << '\n';
+            return;
+        }
 
-    if (std::fseek(file, 0, SEEK_END) != 0) {
-        fclose(file);
-        std::cerr << "fseek() failed on: " << filepath << '\n';
-        return {};
-    }
-    
-    long size = std::ftell(file);
-    if (size <= 0) {
-        fclose(file);
-        std::cerr << "Empty or invalid file: " << filepath << '\n';
-        return {};
-    }
-    rewind(file);
+        struct stat st;
+        if (fstat(fd_, &st) == -1 || st.st_size == 0) {
+            std::cerr << "Empty or invalid file: " << filepath << '\n';
+            close(fd_);
+            fd_ = -1;
+            return;
+        }
+        size_ = static_cast<size_t>(st.st_size);
 
-    std::vector<uint8_t> buffer(size);
-    if (std::fread(buffer.data(), 1, size, file) != static_cast<size_t>(size)) {
-        fclose(file);
-        std::cerr << "Failed to read: " << filepath << '\n';
-        return {};
+        void* mapped = mmap(nullptr, size_, PROT_READ, MAP_PRIVATE, fd_, 0);
+        if (mapped == MAP_FAILED) {
+            std::cerr << "Failed to mmap: " << filepath << '\n';
+            close(fd_);
+            fd_ = -1;
+            size_ = 0;
+            return;
+        }
+        data_ = static_cast<const uint8_t*>(mapped);
     }
 
-    fclose(file);
-    return buffer;
-}
+    ~MappedFile() { release(); }
+
+    MappedFile(const MappedFile&) = delete;
+    MappedFile& operator=(const MappedFile&) = delete;
+
+    MappedFile(MappedFile&& other) noexcept
+        : data_(other.data_), size_(other.size_), fd_(other.fd_)
+    {
+        other.data_ = nullptr;
+        other.size_ = 0;
+        other.fd_ = -1;
+    }
+
+    MappedFile& operator=(MappedFile&& other) noexcept {
+        if (this != &other) {
+            release();
+            data_ = other.data_;
+            size_ = other.size_;
+            fd_ = other.fd_;
+            other.data_ = nullptr;
+            other.size_ = 0;
+            other.fd_ = -1;
+        }
+        return *this;
+    }
+
+    const uint8_t* data() const noexcept { return data_; }
+    size_t size() const noexcept { return size_; }
+    bool valid() const noexcept { return data_ != nullptr && size_ > 0; }
+
+private:
+    void release() noexcept {
+        if (data_) { munmap(const_cast<uint8_t*>(data_), size_); data_ = nullptr; }
+        if (fd_ != -1) { close(fd_); fd_ = -1; }
+        size_ = 0;
+    }
+
+    const uint8_t* data_ = nullptr;
+    size_t size_ = 0;
+    int fd_ = -1;
+};
 
 std::string extractGameName(const std::string& filename) {
     std::string nameOnly = filename.substr(0, filename.find_last_of('.'));
@@ -152,30 +189,30 @@ std::optional<std::string> extractBuildNumber(const std::string& filename) {
     return std::nullopt;
 }
 
-std::optional<SectionInfo> getTextSection(const std::vector<uint8_t>& buffer) {
-    if (buffer.size() < 0x1000) return std::nullopt;
+std::optional<SectionInfo> getTextSection(const uint8_t* data, size_t size) {
+    if (size < 0x1000) return std::nullopt;
 
-    const uint32_t dosSignature = *reinterpret_cast<const uint16_t*>(&buffer[0x00]);
+    const uint32_t dosSignature = *reinterpret_cast<const uint16_t*>(&data[0x00]);
     if (dosSignature != 0x5A4D) return std::nullopt; // MZ
 
-    const uint32_t peOffset = *reinterpret_cast<const uint32_t*>(&buffer[0x3C]);
-    if (peOffset + 0x18 >= buffer.size()) return std::nullopt;
+    const uint32_t peOffset = *reinterpret_cast<const uint32_t*>(&data[0x3C]);
+    if (peOffset + 0x18 >= size) return std::nullopt;
 
-    const uint32_t peSignature = *reinterpret_cast<const uint32_t*>(&buffer[peOffset]);
+    const uint32_t peSignature = *reinterpret_cast<const uint32_t*>(&data[peOffset]);
     if (peSignature != 0x00004550) return std::nullopt; // PE\0\0
 
-    const uint16_t numberOfSections = *reinterpret_cast<const uint16_t*>(&buffer[peOffset + 6]);
-    const uint16_t sizeOfOptionalHeader = *reinterpret_cast<const uint16_t*>(&buffer[peOffset + 20]);
+    const uint16_t numberOfSections = *reinterpret_cast<const uint16_t*>(&data[peOffset + 6]);
+    const uint16_t sizeOfOptionalHeader = *reinterpret_cast<const uint16_t*>(&data[peOffset + 20]);
 
     size_t sectionTableOffset = peOffset + 24 + sizeOfOptionalHeader;
     for (int i = 0; i < numberOfSections; ++i) {
-        if (sectionTableOffset + 40 > buffer.size()) break;
+        if (sectionTableOffset + 40 > size) break;
 
-        const char* name = reinterpret_cast<const char*>(&buffer[sectionTableOffset]);
+        const char* name = reinterpret_cast<const char*>(&data[sectionTableOffset]);
         if (std::strncmp(name, ".text", 5) == 0) {
-            const uint32_t rawDataPtr = *reinterpret_cast<const uint32_t*>(&buffer[sectionTableOffset + 20]);
-            const uint32_t rawSize = *reinterpret_cast<const uint32_t*>(&buffer[sectionTableOffset + 16]);
-            if (rawDataPtr + rawSize <= buffer.size()) {
+            const uint32_t rawDataPtr = *reinterpret_cast<const uint32_t*>(&data[sectionTableOffset + 20]);
+            const uint32_t rawSize = *reinterpret_cast<const uint32_t*>(&data[sectionTableOffset + 16]);
+            if (rawDataPtr + rawSize <= size) {
                 return SectionInfo{ rawDataPtr, rawSize };
             }
         }
@@ -190,23 +227,23 @@ void scanFile(const fs::path& filePath, const std::vector<std::optional<uint8_t>
               std::mutex& outputMutex, std::vector<ResultLine>& outputBuffer)
 {
     const auto filename = filePath.filename().string();
-    const auto buffer = readFile(filePath);
-    if (buffer.empty()) return;
+    MappedFile mapped(filePath);
+    if (!mapped.valid()) return;
 
     const uint8_t* textSegment = nullptr;
     size_t textSize = 0;
 
     if (filePath.extension() == TARGET_EXTENSION_TEXT) {
-        textSegment = buffer.data();
-        textSize = buffer.size();
+        textSegment = mapped.data();
+        textSize = mapped.size();
     } else {
-        auto textSection = getTextSection(buffer);
+        auto textSection = getTextSection(mapped.data(), mapped.size());
         if (!textSection.has_value()) {
             std::lock_guard lock(outputMutex);
             std::cerr << RED << "[-] .text section not found in: " << filename << RESET << '\n';
             return;
         }
-        textSegment = buffer.data() + textSection->rawOffset;
+        textSegment = mapped.data() + textSection->rawOffset;
         textSize = textSection->rawSize;
     }
 
@@ -315,13 +352,13 @@ void extractTextSections(const fs::path& folderPath) {
         if (!entry.is_regular_file() || entry.path().extension() != TARGET_EXTENSION_EXE)
             continue;
 
-        const auto buffer = readFile(entry.path());
-        if (buffer.empty())
+        MappedFile mapped(entry.path());
+        if (!mapped.valid())
             continue;
 
-        auto textSection = getTextSection(buffer);
+        auto textSection = getTextSection(mapped.data(), mapped.size());
         if (!textSection.has_value()) {
-            std::cerr << RED << "[-] .text section not found in: " 
+            std::cerr << RED << "[-] .text section not found in: "
                       << entry.path().filename().string() << RESET << '\n';
             continue;
         }
@@ -336,11 +373,11 @@ void extractTextSections(const fs::path& folderPath) {
         }
 
         outFile.write(
-            reinterpret_cast<const char*>(buffer.data() + textSection->rawOffset),
+            reinterpret_cast<const char*>(mapped.data() + textSection->rawOffset),
             textSection->rawSize
         );
 
-        std::cout << GREEN << "[+]" << RESET << " Extracted .text from " 
+        std::cout << GREEN << "[+]" << RESET << " Extracted .text from "
                   << entry.path().filename().string()
                   << " -> " << outPath.filename().string()
                   << " (" << textSection->rawSize << " bytes)\n";

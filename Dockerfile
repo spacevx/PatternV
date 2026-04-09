@@ -24,9 +24,12 @@ COPY --from=cpp-build /src/build/PatternV /usr/local/bin/PatternV
 COPY --from=web-build /app/.next ./.next
 COPY --from=web-build /app/node_modules ./node_modules
 COPY --from=web-build /app/package.json ./
-# public/ may be empty; copy only if it exists
 RUN mkdir -p ./public
 COPY --from=web-build /app/next.config.ts ./
+
+# Entrypoint script: extract .text sections on first boot, then start
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 ENV NODE_ENV=production
 ENV PATTERNV_EXE_PATH=/usr/local/bin/PatternV
@@ -34,4 +37,4 @@ ENV BUILDS_DIR=/data/builds
 ENV MAX_CONCURRENT_SCANS=3
 
 EXPOSE 3000
-CMD ["npm", "start"]
+ENTRYPOINT ["/entrypoint.sh"]
