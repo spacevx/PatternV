@@ -1,6 +1,6 @@
 # PatternV (Fork)
 
-Fork of [DaniGP17/PatternV](https://github.com/DaniGP17/PatternV) — all credits go to [danielgp](https://github.com/DaniGP17).
+Fork of [DaniGP17/PatternV](https://github.com/DaniGP17/PatternV). All credits go to [danielgp](https://github.com/DaniGP17).
 
 A tool to search byte patterns (IDA-style signatures) across GTA V game build dumps. This fork is **Linux-only** and includes a web interface for online scanning.
 
@@ -17,8 +17,6 @@ A tool to search byte patterns (IDA-style signatures) across GTA V game build du
 ```bash
 docker compose up -d --build
 ```
-
-The web UI is available on port 3000. Configure a reverse proxy (nginx) to expose it.
 
 ## Build
 
