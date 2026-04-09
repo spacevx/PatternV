@@ -44,3 +44,9 @@ x64/
 /.vs
 /build
 .DS_Store
+
+# Web app
+web/node_modules/
+web/.next/
+web/.env.local
+web/db/*.db
