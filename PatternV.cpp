@@ -196,7 +196,7 @@ std::optional<SectionInfo> getTextSection(const uint8_t* data, size_t size) {
     if (dosSignature != 0x5A4D) return std::nullopt; // MZ
 
     const uint32_t peOffset = *reinterpret_cast<const uint32_t*>(&data[0x3C]);
-    if (peOffset + 0x18 >= size) return std::nullopt;
+    if (peOffset >= size || size - peOffset < 0x18) return std::nullopt;
 
     const uint32_t peSignature = *reinterpret_cast<const uint32_t*>(&data[peOffset]);
     if (peSignature != 0x00004550) return std::nullopt; // PE\0\0
@@ -204,7 +204,8 @@ std::optional<SectionInfo> getTextSection(const uint8_t* data, size_t size) {
     const uint16_t numberOfSections = *reinterpret_cast<const uint16_t*>(&data[peOffset + 6]);
     const uint16_t sizeOfOptionalHeader = *reinterpret_cast<const uint16_t*>(&data[peOffset + 20]);
 
-    size_t sectionTableOffset = peOffset + 24 + sizeOfOptionalHeader;
+    size_t sectionTableOffset = static_cast<size_t>(peOffset) + 24 + static_cast<size_t>(sizeOfOptionalHeader);
+    if (numberOfSections > 96) return std::nullopt;
     for (int i = 0; i < numberOfSections; ++i) {
         if (sectionTableOffset + 40 > size) break;
 
@@ -212,7 +213,7 @@ std::optional<SectionInfo> getTextSection(const uint8_t* data, size_t size) {
         if (std::strncmp(name, ".text", 5) == 0) {
             const uint32_t rawDataPtr = *reinterpret_cast<const uint32_t*>(&data[sectionTableOffset + 20]);
             const uint32_t rawSize = *reinterpret_cast<const uint32_t*>(&data[sectionTableOffset + 16]);
-            if (rawDataPtr + rawSize <= size) {
+            if (static_cast<size_t>(rawDataPtr) + static_cast<size_t>(rawSize) <= size) {
                 return SectionInfo{ rawDataPtr, rawSize };
             }
         }

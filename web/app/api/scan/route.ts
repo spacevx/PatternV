@@ -62,7 +62,13 @@ export async function POST(request: Request) {
           send("result", result);
         });
       } catch (err: any) {
-        send("error", { message: err.message || "Scan failed" });
+        console.error("[scan] error:", err);
+        const msg = err.message?.includes("too many pending")
+          ? err.message
+          : err.message?.includes("timed out")
+            ? "Scan timed out"
+            : "Scan failed. Please try again.";
+        send("error", { message: msg });
         controller.close();
         return;
       }

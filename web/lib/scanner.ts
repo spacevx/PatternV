@@ -12,8 +12,8 @@ const BUILDS_DIR = path.resolve(
 );
 const MAX_CONCURRENT =
   parseInt(process.env.MAX_CONCURRENT_SCANS || "3", 10) || 3;
+const MAX_QUEUE_DEPTH = 10;
 
-// Simple promise-based semaphore
 let running = 0;
 const queue: (() => void)[] = [];
 
@@ -21,6 +21,9 @@ function acquireSemaphore(): Promise<void> {
   if (running < MAX_CONCURRENT) {
     running++;
     return Promise.resolve();
+  }
+  if (queue.length >= MAX_QUEUE_DEPTH) {
+    return Promise.reject(new Error("Server busy, too many pending scans. Try again later."));
   }
   return new Promise((resolve) => {
     queue.push(() => {
@@ -47,12 +50,17 @@ export function validatePattern(pattern: string): string | null {
 
   const tokens = trimmed.split(/\s+/);
   if (tokens.length < 2) return "Pattern must have at least 2 bytes";
+  if (tokens.length > 256) return "Pattern too long (max 256 bytes)";
 
+  let concreteCount = 0;
   for (const token of tokens) {
     if (!VALID_TOKEN.test(token)) {
       return `Invalid byte: ${token}`;
     }
+    if (token !== "?" && token !== "??") concreteCount++;
   }
+
+  if (concreteCount === 0) return "Pattern must contain at least one concrete byte (not all wildcards)";
 
   return null;
 }
