@@ -1,0 +1,18 @@
+services:
+  patternv:
+    build: .
+    container_name: patternv
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3800:3000"
+    volumes:
+      - ./builds:/data/builds:ro
+      - patternv-db:/app/db
+    environment:
+      - NODE_ENV=production
+      - PATTERNV_EXE_PATH=/usr/local/bin/PatternV
+      - BUILDS_DIR=/data/builds
+      - MAX_CONCURRENT_SCANS=3
+
+volumes:
+  patternv-db:
