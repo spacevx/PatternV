@@ -93,15 +93,15 @@ export default function PatternInput({ onScan, isScanning, initialPattern = "" }
       <div
         className={`
           flex items-center gap-0
-          bg-bg-input rounded-md border
-          transition-colors duration-150
+          bg-bg-input rounded-[3px] border
+          transition-all duration-200
           ${borderClass}
         `}
         style={isInvalid && touched ? { boxShadow: "0 0 0 1px var(--red-dim)" } : undefined}
       >
         {/* Hex prompt indicator */}
         <span
-          className="select-none pl-3 pr-1 text-text-muted font-mono text-sm"
+          className="select-none pl-3 2xl:pl-4 pr-1 text-text-muted font-mono text-sm 2xl:text-lg"
           aria-hidden="true"
         >
           {">"}
@@ -124,9 +124,9 @@ export default function PatternInput({ onScan, isScanning, initialPattern = "" }
           className={`
             flex-1 min-w-0
             bg-transparent outline-none
-            font-mono text-lg tracking-wider
+            font-mono text-lg 2xl:text-xl tracking-wider
             text-text-primary placeholder:text-text-muted
-            py-3 px-1
+            py-3 2xl:py-4 px-1 2xl:px-2
           `}
         />
 
@@ -136,12 +136,13 @@ export default function PatternInput({ onScan, isScanning, initialPattern = "" }
           aria-label={isScanning ? "Scanning in progress" : "Scan pattern"}
           className={`
             flex items-center gap-2
-            px-5 py-2 mr-1.5
-            rounded font-mono text-sm font-medium tracking-wide
-            transition-all duration-150
+            px-5 2xl:px-7 py-2 2xl:py-3 mr-1.5 2xl:mr-2
+            rounded-[3px] font-mono text-sm 2xl:text-base font-medium uppercase tracking-[1px]
+            border-2 border-transparent
+            transition-all duration-200
             ${canSubmit
-              ? "bg-accent text-white hover:bg-accent-hover cursor-pointer"
-              : "bg-accent/20 text-accent/40 cursor-not-allowed"
+              ? "bg-accent text-white hover:bg-accent-hover border-accent hover:border-accent-hover cursor-pointer"
+              : "bg-accent/20 text-accent/40 cursor-not-allowed opacity-50"
             }
           `}
           style={canSubmit ? { animation: "pulse-glow 2.5s ease-in-out infinite" } : undefined}
@@ -191,7 +192,7 @@ export default function PatternInput({ onScan, isScanning, initialPattern = "" }
         <p
           id="pattern-error"
           role="alert"
-          className="mt-1.5 ml-1 text-xs text-red font-mono"
+          className="mt-1.5 ml-1 text-xs 2xl:text-sm text-red font-mono"
           style={{ animation: "fadeSlideIn 0.2s ease-out" }}
         >
           {validationError}

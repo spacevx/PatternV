@@ -24,7 +24,7 @@ export default function LoadingState({ startTime }: LoadingStateProps) {
   return (
     <div className="w-full" role="status" aria-label="Scanning builds">
       {/* Timer header */}
-      <div className="flex items-center gap-3 mb-4">
+      <div className="flex items-center gap-3 2xl:gap-4 mb-4 2xl:mb-6">
         {/* Pulsing dot */}
         <span className="relative flex h-2.5 w-2.5" aria-hidden="true">
           <span
@@ -34,24 +34,24 @@ export default function LoadingState({ startTime }: LoadingStateProps) {
           <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-accent" />
         </span>
 
-        <span className="font-mono text-sm text-text-secondary">
+        <span className="font-mono text-sm 2xl:text-base text-text-secondary">
           Scanning
           {/* Animated ellipsis */}
           <span style={{ animation: "blink 1s step-end infinite" }}>...</span>
         </span>
 
-        <span className="font-mono text-sm text-amber tabular-nums">
+        <span className="font-mono text-sm 2xl:text-base text-amber tabular-nums">
           {elapsedSeconds}s
         </span>
       </div>
 
       {/* Skeleton rows */}
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1 2xl:gap-1.5">
         {Array.from({ length: SKELETON_ROWS }, (_, i) => (
           <div
             key={i}
             className="
-              h-10 rounded
+              h-10 2xl:h-12 rounded-[3px]
               bg-bg-secondary border border-border
               overflow-hidden relative
             "

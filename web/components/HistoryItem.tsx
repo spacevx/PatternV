@@ -32,8 +32,8 @@ export default function HistoryItem({ entry, isActive, onClick }: HistoryItemPro
       onClick={onClick}
       className={`
         w-full text-left
-        px-3 py-2.5 rounded-sm
-        border-l-2 transition-all duration-100
+        px-3 2xl:px-4 py-2.5 2xl:py-3 rounded-[3px]
+        border-l-2 transition-all duration-200
         cursor-pointer
         ${isActive
           ? "bg-bg-tertiary border-l-accent"
@@ -42,18 +42,18 @@ export default function HistoryItem({ entry, isActive, onClick }: HistoryItemPro
       `}
     >
       {/* Pattern */}
-      <div className="font-mono text-xs text-text-primary tracking-wider truncate">
+      <div className="font-mono text-xs 2xl:text-sm text-text-primary tracking-wider truncate">
         {entry.pattern}
       </div>
 
       {/* Meta row */}
-      <div className="flex items-center gap-2 mt-1">
-        <span className="text-[10px] text-text-muted">
+      <div className="flex items-center gap-2 mt-1 2xl:mt-1.5">
+        <span className="text-[10px] 2xl:text-xs text-text-muted">
           {timeAgo(entry.createdAt)}
         </span>
-        <span className="text-[10px] text-text-muted">--</span>
+        <span className="text-[10px] 2xl:text-xs text-text-muted">--</span>
         <span
-          className={`font-mono text-[10px] font-medium ${
+          className={`font-mono text-[10px] 2xl:text-xs font-medium ${
             matchRatio === 1
               ? "text-green"
               : matchRatio === 0
@@ -64,7 +64,7 @@ export default function HistoryItem({ entry, isActive, onClick }: HistoryItemPro
           {entry.buildsMatched}/{entry.buildsTotal}
         </span>
         {entry.durationMs > 0 && (
-          <span className="text-[10px] text-text-muted ml-auto">
+          <span className="text-[10px] 2xl:text-xs text-text-muted ml-auto">
             {entry.durationMs}ms
           </span>
         )}

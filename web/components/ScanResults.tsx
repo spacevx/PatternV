@@ -20,7 +20,7 @@ export default function ScanResults({ results, pattern, durationMs }: ScanResult
   });
 
   return (
-    <div className="w-full flex flex-col gap-3">
+    <div className="w-full flex flex-col gap-3 2xl:gap-4">
       <ScanStats
         buildsTotal={buildsTotal}
         buildsMatched={buildsMatched}
@@ -30,7 +30,7 @@ export default function ScanResults({ results, pattern, durationMs }: ScanResult
       />
 
       {/* Results list */}
-      <div className="flex flex-col gap-1" role="list" aria-label="Build scan results">
+      <div className="flex flex-col gap-1 2xl:gap-1.5" role="list" aria-label="Build scan results">
         {sorted.map((result, i) => (
           <BuildRow key={result.buildNumber} result={result} index={i} />
         ))}
@@ -38,7 +38,7 @@ export default function ScanResults({ results, pattern, durationMs }: ScanResult
 
       {/* Footer summary */}
       {buildsTotal > 0 && (
-        <p className="text-center text-xs text-text-muted font-mono pt-2">
+        <p className="text-center text-xs 2xl:text-sm text-text-muted font-mono pt-2 2xl:pt-3">
           {buildsTotal} builds scanned -- {buildsMatched} matched -- {totalMatches} total offsets
         </p>
       )}

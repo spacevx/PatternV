@@ -19,24 +19,24 @@ export default function HistoryPanel({
   return (
     <aside className="flex flex-col h-full">
       {/* Header */}
-      <div className="flex items-center gap-2 px-3 py-2.5 border-b border-border">
+      <div className="flex items-center gap-2 px-3 2xl:px-4 py-2.5 2xl:py-3 border-b border-border">
         <svg
           viewBox="0 0 16 16"
           fill="none"
           stroke="currentColor"
           strokeWidth="1.5"
           strokeLinecap="round"
-          className="w-3.5 h-3.5 text-text-muted"
+          className="w-3.5 h-3.5 2xl:w-4 2xl:h-4 text-text-muted"
           aria-hidden="true"
         >
           <circle cx="8" cy="8" r="6" />
           <path d="M8 4.5V8l2.5 1.5" />
         </svg>
-        <span className="text-xs font-medium text-text-secondary">
+        <span className="text-xs 2xl:text-sm font-medium text-text-secondary">
           Recent Scans
         </span>
         {entries.length > 0 && (
-          <span className="text-[10px] text-text-muted ml-auto font-mono">
+          <span className="text-[10px] 2xl:text-xs text-text-muted ml-auto font-mono">
             {entries.length}
           </span>
         )}
@@ -58,7 +58,7 @@ export default function HistoryPanel({
             <p className="text-xs text-text-muted">No scans yet</p>
           </div>
         ) : (
-          <div className="flex flex-col gap-0.5 p-1">
+          <div className="flex flex-col gap-0.5 2xl:gap-1 p-1 2xl:p-1.5">
             {entries.map((entry) => (
               <HistoryItem
                 key={entry.id}

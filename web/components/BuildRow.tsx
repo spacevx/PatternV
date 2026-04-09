@@ -30,13 +30,13 @@ export default function BuildRow({ result, index }: BuildRowProps) {
   return (
     <div
       className={`
-        flex items-start gap-3
-        px-3 py-2.5
-        rounded-sm
+        flex items-start gap-3 2xl:gap-4
+        px-3 2xl:px-4 py-2.5 2xl:py-3.5
+        rounded-[3px]
         border-l-2 ${borderColor}
         ${bgTint}
         hover:brightness-125
-        transition-all duration-100
+        transition-all duration-200
       `}
       style={{
         animation: "fadeSlideIn 0.3s ease-out both",
@@ -46,7 +46,7 @@ export default function BuildRow({ result, index }: BuildRowProps) {
     >
       {/* Status indicator: [+] or [-] */}
       <span
-        className={`font-mono text-sm font-bold ${statusColor} shrink-0 select-none`}
+        className={`font-mono text-sm 2xl:text-base font-semibold ${statusColor} shrink-0 select-none`}
         aria-label={found ? "Found" : "Not found"}
       >
         {statusIndicator}
@@ -56,16 +56,16 @@ export default function BuildRow({ result, index }: BuildRowProps) {
       <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 min-w-0 flex-1">
         {/* Build name + number */}
         <div className="flex items-center gap-2 shrink-0">
-          <span className="text-sm text-text-secondary truncate max-w-[140px]">
+          <span className="text-sm 2xl:text-base text-text-secondary truncate max-w-[140px] 2xl:max-w-[200px]">
             {buildName}
           </span>
-          <span className="font-mono text-sm font-bold text-amber">
+          <span className="font-mono text-sm 2xl:text-base font-semibold text-amber">
             v{buildNumber}
           </span>
         </div>
 
         {/* Match count */}
-        <span className={`font-mono text-xs ${found ? "text-green" : "text-red"}`}>
+        <span className={`font-mono text-xs 2xl:text-sm ${found ? "text-green" : "text-red"}`}>
           {matchCount === 0
             ? "no matches"
             : matchCount === 1
@@ -75,14 +75,14 @@ export default function BuildRow({ result, index }: BuildRowProps) {
 
         {/* Offsets */}
         {found && offsets.length > 0 && (
-          <div className="flex items-center gap-1.5 flex-wrap ml-0 sm:ml-auto">
+          <div className="flex items-center gap-1.5 2xl:gap-2 flex-wrap ml-0 sm:ml-auto">
             {visibleOffsets.map((offset) => (
               <code
                 key={offset}
                 className="
-                  font-mono text-xs text-amber
-                  px-1.5 py-0.5
-                  bg-amber-dim rounded-sm
+                  font-mono text-xs 2xl:text-sm text-amber
+                  px-1.5 2xl:px-2 py-0.5 2xl:py-1
+                  bg-amber-dim rounded-[3px]
                 "
               >
                 {offset}
@@ -97,7 +97,7 @@ export default function BuildRow({ result, index }: BuildRowProps) {
                   px-1.5 py-0.5 rounded-sm
                   text-text-secondary
                   hover:text-text-primary hover:bg-bg-tertiary
-                  transition-colors duration-100
+                  transition-colors duration-200
                   cursor-pointer
                 "
                 aria-label={expanded ? "Show fewer offsets" : `Show ${hiddenCount} more offsets`}

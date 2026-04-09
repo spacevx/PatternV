@@ -33,9 +33,9 @@ export default function ScanStats({
   return (
     <div
       className="
-        flex flex-wrap items-center gap-x-4 gap-y-2
-        px-3 py-2.5
-        bg-bg-secondary rounded-md border border-border
+        flex flex-wrap items-center gap-x-4 2xl:gap-x-6 gap-y-2
+        px-3 2xl:px-5 py-2.5 2xl:py-3.5
+        bg-bg-secondary rounded-[3px] border border-border
       "
       style={{ animation: "fadeSlideIn 0.3s ease-out" }}
       role="region"
@@ -43,7 +43,7 @@ export default function ScanStats({
     >
       {/* Pattern display + copy */}
       <div className="flex items-center gap-1.5 min-w-0">
-        <code className="font-mono text-sm text-text-primary tracking-wider truncate max-w-[300px]">
+        <code className="font-mono text-sm 2xl:text-base text-text-primary tracking-wider truncate max-w-[300px] 2xl:max-w-[500px]">
           {pattern}
         </code>
         <button
@@ -51,7 +51,7 @@ export default function ScanStats({
           className="
             shrink-0 p-1 rounded
             text-text-muted hover:text-text-secondary
-            transition-colors duration-100
+            transition-colors duration-200
             cursor-pointer
           "
           aria-label={copied ? "Copied to clipboard" : "Copy pattern to clipboard"}
@@ -141,13 +141,13 @@ function StatBadge({
     <span
       className={`
         inline-flex items-center gap-1
-        font-mono text-xs
-        px-2 py-1 rounded
+        font-mono text-xs 2xl:text-sm
+        px-2 2xl:px-3 py-1 2xl:py-1.5 rounded-[3px]
         ${bgClass ?? "bg-bg-tertiary"}
         ${colorClass}
       `}
     >
-      <span className="font-bold tabular-nums">{value}</span>
+      <span className="font-semibold tabular-nums">{value}</span>
       {label && <span className="text-text-muted">{label}</span>}
     </span>
   );

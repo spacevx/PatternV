@@ -1,23 +1,23 @@
 @import "tailwindcss";
 
 :root {
-  --bg-primary: #0a0a0f;
-  --bg-secondary: #111118;
-  --bg-tertiary: #1a1a24;
-  --bg-input: #0d0d14;
-  --border: #1e1e2e;
-  --border-focus: #3b3b5c;
-  --text-primary: #e4e4ef;
-  --text-secondary: #6b6b8a;
-  --text-muted: #3d3d5c;
-  --green: #22c55e;
-  --green-dim: #22c55e20;
-  --red: #ef4444;
-  --red-dim: #ef444420;
-  --amber: #f59e0b;
-  --amber-dim: #f59e0b15;
-  --accent: #6366f1;
-  --accent-hover: #818cf8;
+  --bg-primary: #161923;
+  --bg-secondary: #1c1f2e;
+  --bg-tertiary: #242838;
+  --bg-input: #111420;
+  --border: #2a2e3f;
+  --border-focus: #3e4358;
+  --text-primary: #fffff0;
+  --text-secondary: #8b8fa2;
+  --text-muted: #4a4e63;
+  --green: #01a370;
+  --green-dim: #01a37020;
+  --red: #ff2600;
+  --red-dim: #ff260020;
+  --amber: #ffae00;
+  --amber-dim: #ffae0015;
+  --accent: #d4044a;
+  --accent-hover: #f50551;
 }
 
 @theme inline {
@@ -38,7 +38,7 @@
   --color-amber-dim: var(--amber-dim);
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
-  --font-sans: var(--font-inter);
+  --font-sans: var(--font-rubik);
   --font-mono: var(--font-jetbrains-mono);
 }
 
@@ -56,8 +56,15 @@ body::before {
   z-index: -1;
   background-image: radial-gradient(circle, var(--text-muted) 1px, transparent 1px);
   background-size: 24px 24px;
-  opacity: 0.15;
+  opacity: 0.08;
   pointer-events: none;
+}
+
+/* Scale dot grid for large screens */
+@media (min-width: 1536px) {
+  body::before {
+    background-size: 32px 32px;
+  }
 }
 
 /* Scrollbar styling */
@@ -98,6 +105,6 @@ body::before {
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
-  50% { box-shadow: 0 0 12px 2px rgba(99, 102, 241, 0.15); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(212, 4, 74, 0); }
+  50% { box-shadow: 0 0 12px 2px rgba(212, 4, 74, 0.15); }
 }

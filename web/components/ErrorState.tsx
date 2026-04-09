@@ -8,9 +8,9 @@ export default function ErrorState({ message, onRetry }: ErrorStateProps) {
     <div
       className="
         w-full
-        bg-red-dim border border-red/20 rounded-md
-        px-4 py-5
-        flex flex-col sm:flex-row items-start sm:items-center gap-3
+        bg-red-dim border border-red/20 rounded-[3px]
+        px-4 2xl:px-6 py-5 2xl:py-6
+        flex flex-col sm:flex-row items-start sm:items-center gap-3 2xl:gap-4
       "
       style={{ animation: "fadeSlideIn 0.3s ease-out" }}
       role="alert"
@@ -20,7 +20,7 @@ export default function ErrorState({ message, onRetry }: ErrorStateProps) {
         <svg
           viewBox="0 0 20 20"
           fill="none"
-          className="w-5 h-5 text-red"
+          className="w-5 h-5 2xl:w-6 2xl:h-6 text-red"
           aria-hidden="true"
         >
           <path
@@ -41,8 +41,8 @@ export default function ErrorState({ message, onRetry }: ErrorStateProps) {
 
       {/* Error message */}
       <div className="flex-1 min-w-0">
-        <p className="text-sm text-red font-medium">Scan failed</p>
-        <p className="text-sm text-text-secondary mt-0.5 break-words">
+        <p className="text-sm 2xl:text-base text-red font-medium">Scan failed</p>
+        <p className="text-sm 2xl:text-base text-text-secondary mt-0.5 break-words">
           {message}
         </p>
       </div>
@@ -52,12 +52,12 @@ export default function ErrorState({ message, onRetry }: ErrorStateProps) {
         onClick={onRetry}
         className="
           shrink-0
-          px-4 py-1.5 rounded
-          font-mono text-sm
-          bg-red/10 border border-red/30
+          px-4 2xl:px-5 py-1.5 2xl:py-2 rounded-[3px]
+          font-mono text-sm 2xl:text-base uppercase tracking-[1px]
+          bg-red/10 border-2 border-red/30
           text-red
           hover:bg-red/20 hover:border-red/50
-          transition-all duration-150
+          transition-all duration-200
           cursor-pointer
         "
         aria-label="Retry scan"

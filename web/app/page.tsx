@@ -66,9 +66,9 @@ export default function Home() {
     <>
       <Header />
 
-      <main className="flex-1 flex flex-col items-center px-4 md:px-6 pt-6 pb-8 max-w-6xl mx-auto w-full">
+      <main className="flex-1 flex flex-col items-center px-4 md:px-6 2xl:px-10 pt-6 2xl:pt-10 pb-8 2xl:pb-12 max-w-7xl 2xl:max-w-[1920px] mx-auto w-full">
         {/* Search input */}
-        <div className="w-full max-w-4xl mb-6">
+        <div className="w-full max-w-4xl 2xl:max-w-5xl mb-6 2xl:mb-10">
           <PatternInput
             onScan={handleScan}
             isScanning={scan.isScanning}
@@ -77,7 +77,7 @@ export default function Home() {
         </div>
 
         {/* Content area: results + history side by side */}
-        <div className="w-full flex gap-4 flex-1 min-h-0">
+        <div className="w-full flex gap-4 2xl:gap-6 flex-1 min-h-0">
           {/* Results */}
           <div className="flex-1 min-w-0">
             {scan.status === "idle" && (
@@ -105,7 +105,7 @@ export default function Home() {
           </div>
 
           {/* History sidebar -- desktop */}
-          <div className="hidden lg:block w-64 shrink-0 bg-bg-secondary rounded-md border border-border overflow-hidden">
+          <div className="hidden lg:block w-64 2xl:w-80 shrink-0 bg-bg-secondary rounded-[3px] border border-border overflow-hidden">
             <HistoryPanel
               entries={history.entries}
               loading={history.loading}
@@ -153,8 +153,8 @@ export default function Home() {
         )}
       </main>
 
-      <footer className="w-full border-t border-border py-4 px-4 md:px-6">
-        <div className="max-w-6xl mx-auto flex items-center justify-center gap-3 font-mono text-xs text-text-muted">
+      <footer className="w-full border-t border-border py-4 2xl:py-6 px-4 md:px-6 2xl:px-10">
+        <div className="max-w-7xl 2xl:max-w-[1920px] mx-auto flex items-center justify-center gap-3 2xl:gap-4 font-mono text-xs 2xl:text-sm text-text-muted">
           <span>
             Created by{" "}
             <a
