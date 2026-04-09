@@ -28,7 +28,7 @@ export default function Header() {
       </div>
 
       <a
-        href="https://github.com/AhceneDev/PatternV"
+        href="https://github.com/DaniGP17/PatternV"
         target="_blank"
         rel="noopener noreferrer"
         className="text-text-secondary hover:text-text-primary transition-colors"
