@@ -3,7 +3,7 @@ FROM gcc:13-bookworm AS cpp-build
 RUN apt-get update && apt-get install -y cmake && rm -rf /var/lib/apt/lists/*
 WORKDIR /src
 COPY PatternV.cpp CMakeLists.txt ./
-RUN cmake -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release
+RUN cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXE_LINKER_FLAGS="-static-libstdc++ -static-libgcc" && cmake --build build --config Release
 
 # Stage 2: Build Next.js app
 FROM node:20-slim AS web-build
@@ -17,7 +17,7 @@ RUN npm run build
 
 # Stage 3: Production runtime
 FROM node:20-slim
-RUN apt-get update && apt-get install -y libstdc++6 && rm -rf /var/lib/apt/lists/*
+# No libstdc++ needed -- PatternV is statically linked
 WORKDIR /app
 
 COPY --from=cpp-build /src/build/PatternV /usr/local/bin/PatternV
